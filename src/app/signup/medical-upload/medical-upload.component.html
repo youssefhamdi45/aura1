@@ -1,0 +1,200 @@
+<div class="upload-container">
+  <!-- Header -->
+  <div class="upload-header">
+    <button class="back-button" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Retour
+    </button>
+  </div>
+
+  <div class="upload-content">
+    <!-- Step 1: Medical File Upload -->
+    <div class="step-card" *ngIf="currentStep === 'upload'">
+      <div class="icon-badge upload-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+
+      <h1 class="step-title">Téléchargez votre Dossier Médical</h1>
+      <p class="step-subtitle">Importez votre dossier médical au format PDF (max 10 MB)</p>
+
+      <!-- File Upload Area -->
+      <div class="upload-area" *ngIf="!uploadedFile && !uploadComplete">
+        <input
+          type="file"
+          id="fileInput"
+          accept=".pdf"
+          (change)="onFileSelected($event)"
+          style="display: none;"
+        />
+        <label for="fileInput" class="upload-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span class="upload-text">Cliquez pour sélectionner un fichier PDF</span>
+          <span class="upload-hint">ou glissez-déposez ici</span>
+        </label>
+      </div>
+
+      <!-- File Selected -->
+      <div class="file-selected" *ngIf="uploadedFile && !uploadComplete">
+        <div class="file-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span class="file-name">{{uploadedFileName}}</span>
+        </div>
+        <button class="remove-button" (click)="removeFile()" *ngIf="!isUploading">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Upload Progress -->
+      <div class="upload-progress" *ngIf="isUploading">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+        </div>
+        <span class="progress-text">{{uploadProgress}}%</span>
+      </div>
+
+      <!-- Upload Complete -->
+      <div class="upload-success" *ngIf="uploadComplete">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span>Dossier téléchargé avec succès!</span>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{errorMessage}}
+      </div>
+
+      <!-- Action Button -->
+      <button
+        class="action-button"
+        (click)="uploadFile()"
+        [disabled]="!uploadedFile || isUploading || uploadComplete"
+        *ngIf="!uploadComplete"
+      >
+        <span *ngIf="!isUploading">Télécharger le Dossier</span>
+        <span *ngIf="isUploading" class="loading-spinner"></span>
+      </button>
+
+      <button
+        class="action-button"
+        (click)="currentStep = 'face'"
+        *ngIf="uploadComplete"
+      >
+        Continuer →
+      </button>
+    </div>
+
+    <!-- Step 2: Face Recognition -->
+    <div class="step-card" *ngIf="currentStep === 'face'">
+      <div class="icon-badge face-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+          <line x1="9" y1="9" x2="9.01" y2="9"/>
+          <line x1="15" y1="9" x2="15.01" y2="9"/>
+        </svg>
+      </div>
+
+      <h1 class="step-title">Reconnaissance Faciale</h1>
+      <p class="step-subtitle">Configurez la reconnaissance faciale pour un accès rapide et sécurisé</p>
+
+      <!-- Face Scanner -->
+      <div class="face-scanner" *ngIf="!faceRecognitionComplete">
+        <div class="scanner-frame" [class.active]="faceRecognitionActive">
+          <div class="scan-corners">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+          </div>
+          <div class="scan-line" *ngIf="faceRecognitionActive"></div>
+        </div>
+        <p class="scanner-text" *ngIf="!faceRecognitionActive">Positionnez votre visage dans le cadre</p>
+        <p class="scanner-text active" *ngIf="faceRecognitionActive">Scan en cours... {{faceRecognitionProgress}}%</p>
+      </div>
+
+      <!-- Face Recognition Complete -->
+      <div class="face-success" *ngIf="faceRecognitionComplete">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span>Reconnaissance faciale configurée!</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group" *ngIf="!faceRecognitionActive && !faceRecognitionComplete">
+        <button class="action-button" (click)="startFaceRecognition()">
+          Démarrer le Scan
+        </button>
+        <button class="skip-button" (click)="skipFaceRecognition()">
+          Passer cette étape
+        </button>
+      </div>
+
+      <button
+        class="action-button"
+        (click)="currentStep = 'complete'"
+        *ngIf="faceRecognitionComplete"
+      >
+        Terminer →
+      </button>
+    </div>
+
+    <!-- Step 3: Complete -->
+    <div class="step-card complete-card" *ngIf="currentStep === 'complete'">
+      <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+
+      <h1 class="step-title">Inscription Réussie!</h1>
+      <p class="step-subtitle">Votre compte patient a été créé avec succès</p>
+
+      <div class="complete-info">
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Compte créé</span>
+        </div>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Dossier médical téléchargé</span>
+        </div>
+        <div class="info-item" *ngIf="faceRecognitionComplete">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Reconnaissance faciale activée</span>
+        </div>
+      </div>
+
+      <button class="action-button success-button" (click)="completeRegistration()">
+        Accéder à mon Dossier
+      </button>
+    </div>
+  </div>
+</div>

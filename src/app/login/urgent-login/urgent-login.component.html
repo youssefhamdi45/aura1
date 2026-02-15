@@ -1,0 +1,237 @@
+<div class="urgent-container">
+  <!-- Emergency Header -->
+  <div class="emergency-header">
+    <div class="emergency-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+      <span>MODE URGENCE</span>
+    </div>
+    <button class="back-button" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Retour
+    </button>
+  </div>
+
+  <div class="urgent-content">
+    <!-- Step 1: Patient Selection -->
+    <div class="step-container" *ngIf="currentStep === 'selection'">
+      <h1 class="urgent-title">Accès Rapide d'Urgence</h1>
+      <p class="urgent-subtitle">Sélectionnez le type de patient pour un accès immédiat</p>
+
+      <div class="selection-cards">
+        <div class="selection-card" (click)="selectPatientWithCIN()">
+          <div class="card-icon red-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="M7 15h0M2 9.5h20"/>
+            </svg>
+          </div>
+          <h3>Patient avec CIN</h3>
+          <p>Accès avec carte d'identité nationale</p>
+          <div class="card-arrow">→</div>
+        </div>
+
+        <div class="selection-card" (click)="selectPatientUnder18()">
+          <div class="card-icon orange-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h3>Patient Mineur</h3>
+          <p>Moins de 18 ans, sans CIN</p>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2A: Patient with CIN -->
+    <div class="step-container" *ngIf="currentStep === 'hasCIN'">
+      <h1 class="urgent-title">Authentification Rapide</h1>
+      <p class="urgent-subtitle">Vérification d'identité pour accès d'urgence</p>
+
+      <div class="form-card">
+        <!-- Unconscious Toggle -->
+        <div class="unconscious-toggle" (click)="toggleUnconscious()">
+          <div class="toggle-switch" [class.active]="isUnconscious">
+            <div class="switch-knob"></div>
+          </div>
+          <div class="toggle-label">
+            <span class="toggle-text">Patient inconscient</span>
+            <span class="toggle-description">Un responsable doit s'identifier</span>
+          </div>
+        </div>
+
+        <!-- Conscious Patient Form -->
+        <div *ngIf="!isUnconscious" class="auth-section">
+          <div class="input-group">
+            <label for="cin">Numéro CIN</label>
+            <input
+              type="text"
+              id="cin"
+              [(ngModel)]="cinNumber"
+              placeholder="Ex: AB123456"
+              class="form-input"
+              maxlength="8"
+            />
+          </div>
+
+          <div class="divider">
+            <span>OU</span>
+          </div>
+
+          <button class="faceid-button" (click)="activateFaceID()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+              <line x1="9" y1="9" x2="9.01" y2="9"/>
+              <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+            Authentification Face ID
+          </button>
+
+          <button 
+            class="submit-button urgent-submit" 
+            (click)="verifyCIN()"
+            [disabled]="!cinNumber || isLoading"
+          >
+            <span *ngIf="!isLoading">Accéder aux Informations Médicales</span>
+            <span *ngIf="isLoading" class="loading-spinner"></span>
+          </button>
+        </div>
+
+        <!-- Unconscious Patient Form -->
+        <div *ngIf="isUnconscious" class="auth-section">
+          <div class="alert-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>Identification du responsable ou professionnel de santé requis</span>
+          </div>
+
+          <div class="input-group">
+            <label for="responsibleCIN">CIN du Responsable</label>
+            <input
+              type="text"
+              id="responsibleCIN"
+              [(ngModel)]="responsibleCIN"
+              placeholder="Numéro CIN du responsable"
+              class="form-input"
+              maxlength="8"
+            />
+          </div>
+
+          <div class="divider">
+            <span>OU</span>
+          </div>
+
+          <button class="faceid-button" (click)="activateFaceID()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+              <line x1="9" y1="9" x2="9.01" y2="9"/>
+              <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+            Face ID du Responsable
+          </button>
+
+          <button 
+            class="submit-button urgent-submit" 
+            (click)="verifyResponsible()"
+            [disabled]="!responsibleCIN || isLoading"
+          >
+            <span *ngIf="!isLoading">Valider et Accéder</span>
+            <span *ngIf="isLoading" class="loading-spinner"></span>
+          </button>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2B: Patient Under 18 -->
+    <div class="step-container" *ngIf="currentStep === 'noCIN'">
+      <h1 class="urgent-title">Patient Mineur</h1>
+      <p class="urgent-subtitle">Accès limité aux informations médicales vitales</p>
+
+      <div class="form-card">
+        <div class="alert-box minor-alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Vérification parentale requise pour l'accès d'urgence</span>
+        </div>
+
+        <div class="input-group">
+          <label for="childName">Nom Complet de l'Enfant</label>
+          <input
+            type="text"
+            id="childName"
+            [(ngModel)]="childName"
+            placeholder="Prénom et Nom"
+            class="form-input"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="parentCIN">CIN du Parent/Tuteur</label>
+          <input
+            type="text"
+            id="parentCIN"
+            [(ngModel)]="parentCIN"
+            placeholder="Ex: AB123456"
+            class="form-input"
+            maxlength="8"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="secretAnswer">Question de Sécurité</label>
+          <input
+            type="text"
+            id="secretAnswer"
+            [(ngModel)]="secretAnswer"
+            placeholder="Nom de jeune fille de la mère"
+            class="form-input"
+          />
+        </div>
+
+        <button 
+          class="submit-button urgent-submit" 
+          (click)="verifyChild()"
+          [disabled]="!childName || !parentCIN || !secretAnswer || isLoading"
+        >
+          <span *ngIf="!isLoading">Vérifier et Accéder</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Face ID Modal -->
+  <div class="faceid-modal" *ngIf="showFaceID">
+    <div class="faceid-content">
+      <div class="faceid-scanner">
+        <div class="scan-circle"></div>
+        <div class="scan-line"></div>
+      </div>
+      <h3>Scan en cours...</h3>
+      <p>Veuillez regarder la caméra</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,164 @@
+<div class="signup-container">
+  <!-- Header -->
+  <div class="signup-header">
+    <button class="back-button" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Retour
+    </button>
+  </div>
+
+  <div class="signup-content">
+    <div class="signup-card">
+      <!-- Icon -->
+      <div class="icon-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+
+      <h1 class="signup-title">Inscription Établissement</h1>
+      <p class="signup-subtitle">Créez un compte pour votre établissement de santé</p>
+
+      <!-- Form -->
+      <form class="signup-form" (ngSubmit)="submitForm()">
+        <!-- Nom Établissement -->
+        <div class="input-group">
+          <label for="nomEtablissement">Nom de l'Établissement <span class="required">*</span></label>
+          <input
+            type="text"
+            id="nomEtablissement"
+            [(ngModel)]="nomEtablissement"
+            name="nomEtablissement"
+            placeholder="Nom complet de l'établissement"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <!-- Nature -->
+        <div class="input-group">
+          <label for="nature">Nature de l'Établissement <span class="required">*</span></label>
+          <select
+            id="nature"
+            [(ngModel)]="nature"
+            name="nature"
+            class="form-select"
+            (change)="onNatureChange()"
+            required
+          >
+            <option value="">-- Sélectionnez --</option>
+            <option *ngFor="let option of natureOptions" [value]="option.value">
+              {{option.label}}
+            </option>
+          </select>
+        </div>
+
+        <!-- Spécialité (only for médecin privé) -->
+        <div class="input-group" *ngIf="showSpecialite">
+          <label for="specialite">Spécialité <span class="required">*</span></label>
+          <select
+            id="specialite"
+            [(ngModel)]="specialite"
+            name="specialite"
+            class="form-select"
+            [required]="showSpecialite"
+          >
+            <option value="">-- Sélectionnez une spécialité --</option>
+            <option *ngFor="let option of specialiteOptions" [value]="option.value">
+              {{option.label}}
+            </option>
+          </select>
+        </div>
+
+        <!-- Localisation -->
+        <div class="input-group">
+          <label for="localisation">Localisation (Wilaya) <span class="required">*</span></label>
+          <select
+            id="localisation"
+            [(ngModel)]="localisation"
+            name="localisation"
+            class="form-select"
+            required
+          >
+            <option value="">-- Sélectionnez une wilaya --</option>
+            <option *ngFor="let wilaya of wilayaOptions" [value]="wilaya.value">
+              {{wilaya.label}}
+            </option>
+          </select>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="input-group">
+          <label for="motDePasse">Mot de passe <span class="required">*</span></label>
+          <div class="password-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="motDePasse"
+              [(ngModel)]="motDePasse"
+              name="motDePasse"
+              placeholder="8 caractères minimum"
+              class="form-input"
+              required
+            />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility('password')">
+              <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirmation mot de passe -->
+        <div class="input-group">
+          <label for="confirmMotDePasse">Confirmez le mot de passe <span class="required">*</span></label>
+          <div class="password-wrapper">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmMotDePasse"
+              [(ngModel)]="confirmMotDePasse"
+              name="confirmMotDePasse"
+              placeholder="Confirmez votre mot de passe"
+              class="form-input"
+              required
+            />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
+              <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-button" [disabled]="isLoading">
+          <span *ngIf="!isLoading">S'inscrire</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        Vous avez déjà un compte ? <a href="javascript:void(0)" (click)="goBack()">Se connecter</a>
+      </div>
+    </div>
+  </div>
+</div>

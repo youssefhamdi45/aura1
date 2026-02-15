@@ -1,0 +1,221 @@
+<div class="normal-container">
+  <!-- Header -->
+  <div class="normal-header">
+    <button class="back-button" (click)="goBack()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ isAuthenticated ? 'Déconnexion' : 'Retour' }}
+    </button>
+    <div class="normal-badge">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 8V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      CAS NORMAL
+    </div>
+  </div>
+
+  <!-- Authentication Form -->
+  <div *ngIf="!isAuthenticated" class="auth-content">
+    <div class="title-section">
+      <h1 class="main-title">Accès Cas Normal</h1>
+      <p class="subtitle">Authentification complète du patient requise</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="card-header">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21ZM16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11H16Z" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h2>Authentification Patient</h2>
+      </div>
+
+      <form (submit)="authenticate(); $event.preventDefault()">
+        <div class="form-group">
+          <label>CIN du Patient</label>
+          <input 
+            type="text" 
+            [(ngModel)]="cin" 
+            name="cin"
+            placeholder="Entrer CIN (8 chiffres)"
+            maxlength="8"
+            class="form-input"
+            (keypress)="$event.key >= '0' && $event.key <= '9' ? true : $event.preventDefault()"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Mot de Passe</label>
+          <div class="password-input-group">
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password" 
+              name="password"
+              placeholder="Entrer le mot de passe"
+              class="form-input"
+              required
+            />
+            <button 
+              type="button"
+              class="toggle-password"
+              (click)="togglePasswordVisibility()"
+            >
+              <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3L21 21M10.5 10.5C10.1872 10.8128 10 11.2371 10 11.6667C10 12.5871 10.7462 13.3333 11.6667 13.3333C12.0962 13.3333 12.5205 13.1462 12.8333 12.8333M17.5 17.5C15.8479 18.7705 13.8164 19.5 11.6667 19.5C5.66667 19.5 1.66667 12 1.66667 12C3.49827 8.99469 5.81455 6.87054 8.5 5.5M14.5 4.5C16.7321 5.46667 18.8351 7.59014 20.6667 10.5C20.6667 10.5 16.6667 18 10.6667 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+        <button type="submit" class="auth-button" [disabled]="isLoading">
+          <svg *ngIf="!isLoading" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H15M10 17L15 12M15 12L10 7M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Authentification...' : 'Accéder au Dossier' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Patient Dashboard -->
+  <div *ngIf="isAuthenticated" class="patient-dashboard">
+    <!-- Patient Header -->
+    <div class="patient-header">
+      <div class="patient-avatar">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="patient-info">
+        <h2>{{ patientData.name }}</h2>
+        <p>{{ patientData.age }} ans • {{ patientData.gender }}</p>
+      </div>
+      <div class="blood-badge">{{ patientData.bloodType }}</div>
+    </div>
+
+    <!-- Patient Details -->
+    <div class="dashboard-grid">
+      <!-- Contact Information -->
+      <div class="info-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="#3b82f6" stroke-width="2"/>
+            <circle cx="12" cy="10" r="3" stroke="#3b82f6" stroke-width="2"/>
+          </svg>
+          Coordonnées
+        </h3>
+        <div class="info-item">
+          <strong>CIN:</strong> {{ patientData.cin }}
+        </div>
+        <div class="info-item">
+          <strong>Téléphone:</strong> {{ patientData.phone }}
+        </div>
+        <div class="info-item">
+          <strong>Email:</strong> {{ patientData.email }}
+        </div>
+        <div class="info-item">
+          <strong>Adresse:</strong> {{ patientData.address }}
+        </div>
+      </div>
+
+      <!-- Medical Information -->
+      <div class="info-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Informations Médicales
+        </h3>
+        <div class="info-item">
+          <strong>Groupe Sanguin:</strong> {{ patientData.bloodType }}
+        </div>
+        <div class="info-item">
+          <strong>Allergies:</strong>
+          <div class="tag-list">
+            <span *ngFor="let allergy of patientData.allergies" class="tag allergy-tag">{{ allergy }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <strong>Maladies Chroniques:</strong>
+          <div class="tag-list">
+            <span *ngFor="let disease of patientData.chronicDiseases" class="tag disease-tag">{{ disease }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <strong>Médicaments en Cours:</strong>
+          <div class="tag-list">
+            <span *ngFor="let med of patientData.currentMedications" class="tag medication-tag">{{ med }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical History -->
+      <div class="history-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Historique Médical
+        </h3>
+        <div class="history-list">
+          <div *ngFor="let record of patientData.medicalHistory" class="history-item">
+            <div class="history-date">{{ record.date }}</div>
+            <div class="history-details">
+              <div class="history-type">{{ record.type }}</div>
+              <div class="history-doctor">{{ record.doctor }}</div>
+              <div class="history-diagnosis">{{ record.diagnosis }}</div>
+              <div class="history-notes">{{ record.notes }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="documents-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 21H17C18.1046 21 19 20.1046 19 19V9L13 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21Z" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 3V9H19" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          Documents Médicaux
+        </h3>
+        <div class="documents-list">
+          <div *ngFor="let doc of patientData.documents" class="document-item">
+            <div class="doc-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 21H17C18.1046 21 19 20.1046 19 19V9L13 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21Z" stroke="#ef4444" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="doc-info">
+              <div class="doc-name">{{ doc.name }}</div>
+              <div class="doc-meta">{{ doc.date }} • {{ doc.size }}</div>
+            </div>
+            <div class="doc-actions">
+              <button class="icon-button" (click)="viewDocument(doc.name)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+              <button class="icon-button" (click)="downloadDocument(doc.name)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

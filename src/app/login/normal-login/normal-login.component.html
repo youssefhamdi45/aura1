@@ -1,0 +1,271 @@
+<div class="normal-container">
+  <!-- Header -->
+  <div class="normal-header">
+    <div class="medical-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+      <span>ACCÈS NORMAL</span>
+    </div>
+    <button class="back-button" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Retour
+    </button>
+  </div>
+
+  <div class="normal-content">
+    <!-- Step 1: Login Type Selection -->
+    <div class="step-container" *ngIf="currentStep === 'selection'">
+      <h1 class="normal-title">Connexion à Votre Dossier</h1>
+      <p class="normal-subtitle">Choisissez votre mode d'authentification</p>
+
+      <div class="selection-cards">
+        <div class="selection-card" (click)="selectCINLogin()">
+          <div class="card-icon blue-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="M7 15h0M2 9.5h20"/>
+            </svg>
+          </div>
+          <h3>Connexion avec CIN</h3>
+          <p>Accès complet à votre dossier médical</p>
+          <div class="features-list">
+            <div class="feature-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Consultation complète</span>
+            </div>
+            <div class="feature-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Historique médical</span>
+            </div>
+            <div class="feature-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Téléchargement documents</span>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </div>
+
+        <div class="selection-card" (click)="selectMinorLogin()">
+          <div class="card-icon purple-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h3>Connexion Mineur</h3>
+          <p>Pour les patients de moins de 18 ans</p>
+          <div class="features-list">
+            <div class="feature-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>CIN du tuteur requis</span>
+            </div>
+            <div class="feature-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Question de sécurité</span>
+            </div>
+            <div class="feature-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Accès limité et sécurisé</span>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2A: CIN Login -->
+    <div class="step-container" *ngIf="currentStep === 'cinLogin'">
+      <h1 class="normal-title">Connexion CIN</h1>
+      <p class="normal-subtitle">Authentification sécurisée avec votre carte d'identité</p>
+
+      <div class="form-card">
+        <div class="security-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <span>Connexion sécurisée - Vos données sont protégées</span>
+        </div>
+
+        <div class="input-group">
+          <label for="cin">Numéro CIN</label>
+          <input
+            type="text"
+            id="cin"
+            [(ngModel)]="cinNumber"
+            placeholder="Ex: AB123456"
+            class="form-input"
+            maxlength="8"
+            (keyup.enter)="verifyCIN()"
+          />
+          <small class="input-hint">8 caractères alphanumériques</small>
+        </div>
+
+        <button 
+          class="submit-button normal-submit" 
+          (click)="verifyCIN()"
+          [disabled]="!cinNumber || cinNumber.length < 8 || isLoading"
+        >
+          <span *ngIf="!isLoading">Se Connecter</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+
+        <div class="help-section">
+          <p>Première connexion ? <a href="javascript:void(0)" class="help-link" (click)="navigateToSignup()">Créer un compte</a></p>
+          <p>Problème de connexion ? <a href="javascript:void(0)" class="help-link">Contactez le support</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2B: Minor Login -->
+    <div class="step-container" *ngIf="currentStep === 'minorLogin'">
+      <h1 class="normal-title">Connexion Mineur</h1>
+      <p class="normal-subtitle">Accès au dossier médical de votre enfant</p>
+
+      <div class="form-card">
+        <div class="info-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Cette connexion nécessite l'autorisation du tuteur légal</span>
+        </div>
+
+        <div class="input-group">
+          <label for="childName">Nom Complet de l'Enfant</label>
+          <input
+            type="text"
+            id="childName"
+            [(ngModel)]="childFullName"
+            placeholder="Prénom et Nom"
+            class="form-input"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="parentCIN">CIN du Parent/Tuteur Légal</label>
+          <input
+            type="text"
+            id="parentCIN"
+            [(ngModel)]="parentCIN"
+            placeholder="Ex: AB123456"
+            class="form-input"
+            maxlength="8"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="secretQuestion">Question de Sécurité</label>
+          <select
+            id="secretQuestion"
+            [(ngModel)]="secretQuestion"
+            class="form-select"
+          >
+            <option value="">-- Sélectionnez une question --</option>
+            <option *ngFor="let question of secretQuestions" [value]="question">
+              {{question}}
+            </option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="secretAnswer">Réponse</label>
+          <input
+            type="text"
+            id="secretAnswer"
+            [(ngModel)]="secretAnswer"
+            placeholder="Votre réponse"
+            class="form-input"
+            (keyup.enter)="verifyMinor()"
+          />
+        </div>
+
+        <button 
+          class="submit-button normal-submit" 
+          (click)="verifyMinor()"
+          [disabled]="!childFullName || !parentCIN || !secretQuestion || !secretAnswer || isLoading"
+        >
+          <span *ngIf="!isLoading">Vérifier et Se Connecter</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{errorMessage}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: QR Code Display -->
+    <div class="step-container qr-container" *ngIf="currentStep === 'qrCode'">
+      <div class="qr-card">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+
+        <h2 class="qr-title">Connexion Réussie</h2>
+        <p class="qr-welcome">Bienvenue, <strong>{{userName}}</strong></p>
+
+        <!-- QR Code Display (Placeholder) -->
+        <div class="qr-code-display">
+          <div class="qr-grid">
+            <!-- Simple QR-like pattern placeholder -->
+            <div class="qr-pattern" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]">
+            </div>
+          </div>
+          <div class="qr-label">{{qrCodeData}}</div>
+        </div>
+
+        <div class="qr-instructions">
+          <h3>Comment utiliser ce code QR :</h3>
+          <ol>
+            <li>Rendez-vous à la réception ou au guichet médical</li>
+            <li>Présentez ce code QR au personnel</li>
+            <li>Le scanner permettra un accès rapide à votre dossier</li>
+          </ol>
+        </div>
+
+        <div class="qr-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Ce code QR expire après 24 heures</span>
+        </div>
+
+        <button class="logout-button" (click)="logout()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Se Déconnecter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
